@@ -156,6 +156,22 @@ You can also `push` snapshots up with a specific name:
 anon push foo.sql mydb --snapshot someid
 ```
 
+### Tab completion
+
+Enable `bash` completion by adding the following to your `.bashrc`:
+
+```bash
+eval "$(_ANON_COMPLETE=source anon)"
+```
+
+If you use `zsh`, you can emulate bash completion by first adding `bashcompinit` to your `.zshrc`:
+
+```bash
+autoload bashcompinit
+bashcompinit
+eval "$(_ANON_COMPLETE=source anon)"
+```
+
 ### Todo
 
 - better repr results (include type, etc.)
