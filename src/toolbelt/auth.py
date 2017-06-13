@@ -8,6 +8,11 @@ def login(key, secret):
     c['creds'] = [key, secret]
     config.write(c)
 
+def logout():
+    c = config.read()
+    del c['creds']
+    config.write(c)
+
 def credentials():
     c = config.read()
     return c.get('creds')

@@ -12,7 +12,7 @@ setup(
     zip_safe=False,
     entry_points = {
         'console_scripts': [
-            'anon = toolbelt.command:main',
+            'anon = toolbelt.command:main'
         ],
     },
 )
