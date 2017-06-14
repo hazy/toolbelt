@@ -17,9 +17,9 @@ pip install anon-ai-toolbelt
 
 ## Usage
 
-The primary workflow is for a privileged process or developer to `push` data into the system and then for less-priviledged processes or developers to `pull` the data down in anonymised form.
+The primary workflow is for a privileged process or developer to `push` data into the system and then for less-privileged processes, developers or collaborators to `pull` the data down in anonymised form.
 
-Data sets can be anonymised in different ways for different users or use cases. This configuration is integrated with a role-based permission system that can be used to control which users can access which aspects for which data.
+Data anonymisation can be configured differently for different users or use cases. This configuration is integrated with a role-based permission system that controls which users can access which aspects of which data.
 
 *Note that the anonymisation configuration options and the role-based permission system are currently unspecified.*
 
