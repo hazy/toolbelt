@@ -38,7 +38,7 @@ class Client(object):
             click.secho(msg, fg='red')
             raise click.Abort()
         if code != 200:
-            msg = 'Error. Please try again.'
+            msg = 'Error {0}. Please try again.'.format(response)
             click.secho(msg, fg='red')
             raise click.Abort()
         return response
@@ -47,4 +47,10 @@ class Client(object):
         url = self.endpoint + path
         headers = self.auth_headers()
         r = requests.post(url, headers=headers, json=data)
+        return self.wrap(r)
+
+    def upload(self, path, input_):
+        url = self.endpoint + path
+        headers = self.auth_headers()
+        r = requests.post(url, headers=headers, files={'upload': input_})
         return self.wrap(r)

@@ -33,38 +33,90 @@ def logout():
     click.echo('Credentials cleared.')
 
 @click.command()
-@click.argument('input', metavar='INPUT_PATH_OR_URL')
-@click.argument('output', metavar='OUTPUT_PATH', type=click.Path())
+@click.argument('input', metavar='URL')
 @click.option('--format', 'format_', default='auto', show_default=True)
 @click.option('--config', type=click.Path(exists=True))
 @auth.pass_client
-def pipe(client, input, output, format_, config):
+def pipe(client, input, format_, config):
     """Anonymise data on the fly.
 
       \b
-      Read the INPUT data from a local file PATH or a URL.
-      OUTPUT the anonymised data to a local file PATH.
+      Read the INPUT data from a URL.
+      Writes the anonymised data to stdout.
 
       Note that this parses, analyses and anonymises the data without
       persisting it. As a result, `pipe` is slower for repeated access
       than using `pull` to read previously ingested data.
     """
 
-    if '://' in input:
-        pipe_url(client, input, output, format_, config)
-    else:
-        pipe_file(client, input, output, format_, config)
-
-def pipe_url(client, input_, output, format_, config):
     path = '/redact/proxy'
     data = {'url': input_, 'format': format_}
     r = client.post(path, {'data': data})
-    with click.open_file(output, mode='wb') as f:
+    with click.open_file('-', mode='wb') as f:
         for chunk in r.iter_content(chunk_size=4096):
             f.write(chunk)
 
-def pipe_file(*args):
-    raise NotImplementedError
+@click.command()
+@click.argument('input', metavar='INPUT_FILE_OR_URL')
+@click.argument('name', metavar='RESOURCE_NAME') # XXX validate
+@click.option('--format', 'format_', default='auto', show_default=True)
+@auth.pass_client
+def push(client, input, name, format_):
+    """Ingest and store a data snapshot.
+
+      \b
+      Read the INPUT data from a local file PATH or a URL.
+      Ingests it into a named RESOURCE.
+    """
+
+    if '://' in input:
+        push_url(client, input, name, format_)
+    else:
+        push_file(client, input, name, format_)
+
+def push_url(client, input_, name, format_):
+    # First ingest.
+    path = '/source/default/{0}'.format(name)
+    data = {'url': input_, 'format': format_}
+    r = client.post(path, {'data': data})
+    # Then parse.
+    path = '/parse/source/default/{0}'.format(name)
+    r = client.post(path, {})
+    click.secho(r.text, fg='green')
+
+def push_file(client, input, name, format_):
+    # First create an upload.
+    path = '/source/default/{0}'.format(name)
+    data = {'stream': True, 'format': format_}
+    r = client.post(path, {'data': data})
+    # Then stream the file up.
+    path = r.json()['data']['path']
+    with click.open_file(input, mode='rb') as f:
+        r = client.upload(path, f)
+    # Then parse.
+    path = '/parse/source/default/{0}'.format(name)
+    r = client.post(path, {})
+    click.secho(r.text, fg='green')
+
+@click.command()
+@click.argument('name', metavar='RESOURCE_NAME') # XXX validate
+@click.option('--config', type=click.Path(exists=True))
+@auth.pass_client
+def pull(client, name, config):
+    """Get an anonymised data snapshot.
+
+      \b
+      Read from a named RESOURCE.
+      Writes the anonymised data to stdout.
+    """
+
+    path = '/redact/source/default/{0}'.format(name)
+    # XXX not dealing with the config yet
+    data = {}
+    r = client.post(path, data)
+    with click.open_file('-', mode='wb') as f:
+        for chunk in r.iter_content(chunk_size=4096):
+            f.write(chunk)
 
 @click.group(cls=alias.AliasedGroup)
 @click.option('--endpoint', metavar='URL', envvar='ANON_AI_ENDPOINT',
@@ -94,3 +146,5 @@ def main(ctx, endpoint):
 main.add_command(login)
 main.add_command(logout)
 main.add_command(pipe)
+main.add_command(push)
+main.add_command(pull)
