@@ -3,6 +3,7 @@
   Run `anon --help` for usage.
 """
 
+import base64
 import click
 import math
 import sys
@@ -33,66 +34,48 @@ def logout():
     click.echo('Credentials cleared.')
 
 @click.command()
-@click.argument('input', metavar='URL')
-@click.option('--format', 'format_', default='auto', show_default=True)
-@click.option('--config', type=click.Path(exists=True))
-@auth.pass_client
-def pipe(client, input, format_, config):
-    """Anonymise data on the fly.
-
-      \b
-      Read the INPUT data from a URL.
-      Writes the anonymised data to stdout.
-
-      Note that this parses, analyses and anonymises the data without
-      persisting it. As a result, `pipe` is slower for repeated access
-      than using `pull` to read previously ingested data.
-    """
-
-    path = '/redact/proxy'
-    data = {'url': input_, 'format': format_}
-    r = client.post(path, {'data': data})
-    with click.open_file('-', mode='wb') as f:
-        for chunk in r.iter_content(chunk_size=4096):
-            f.write(chunk)
-
-@click.command()
-@click.argument('input', metavar='INPUT_FILE_OR_URL')
+@click.argument('input', metavar='FILE_OR_URL')
 @click.argument('name', metavar='RESOURCE_NAME') # XXX validate
+@click.option('--encryption-key', metavar='LONG_RANDOM_STRING')
 @click.option('--format', 'format_', default='auto', show_default=True)
 @auth.pass_client
-def push(client, input, name, format_):
+def push(client, input, name, encryption_key, format_):
     """Ingest and store a data snapshot.
 
       \b
-      Read the INPUT data from a local file PATH or a URL.
+      Read the input data from a local file path or a URL.
       Ingests it into a named RESOURCE.
     """
 
+    data = {'format': format_}
+    if encryption_key:
+        data['encryption_key'] = base64.b64encode(encryption_key)
     if '://' in input:
-        push_url(client, input, name, format_)
+        push_url(client, input, name, data)
     else:
-        push_file(client, input, name, format_)
+        push_file(client, input, name, data)
 
-def push_url(client, input_, name, format_):
+def push_url(client, url, name, data):
     # First ingest.
+    data['url'] = url
     path = '/source/default/{0}'.format(name)
-    data = {'url': input_, 'format': format_}
     r = client.post(path, {'data': data})
     # Then parse.
     path = '/parse/source/default/{0}'.format(name)
     r = client.post(path, {})
     click.secho(r.text, fg='green')
 
-def push_file(client, input, name, format_):
+def push_file(client, file_, name, data):
     # First create an upload.
+    data['stream'] = True
     path = '/source/default/{0}'.format(name)
-    data = {'stream': True, 'format': format_}
     r = client.post(path, {'data': data})
     # Then stream the file up.
-    path = r.json()['data']['path']
-    with click.open_file(input, mode='rb') as f:
-        r = client.upload(path, f)
+    r_data = r.json()['data']
+    path = r_data['path']
+    datakey = base64.b64decode(r_data['datakey'])
+    with click.open_file(file_, mode='rb') as f:
+        r = client.upload(path, f, datakey)
     # Then parse.
     path = '/parse/source/default/{0}'.format(name)
     r = client.post(path, {})
@@ -100,9 +83,10 @@ def push_file(client, input, name, format_):
 
 @click.command()
 @click.argument('name', metavar='RESOURCE_NAME') # XXX validate
-@click.option('--config', type=click.Path(exists=True))
+@click.option('--config', type=click.File())
+@click.option('--encryption-key', metavar='LONG_RANDOM_STRING')
 @auth.pass_client
-def pull(client, name, config):
+def pull(client, name, config, encryption_key):
     """Get an anonymised data snapshot.
 
       \b
@@ -111,9 +95,48 @@ def pull(client, name, config):
     """
 
     path = '/redact/source/default/{0}'.format(name)
-    # XXX not dealing with the config yet
     data = {}
+    if config:
+        try:
+            data['config'] = json.loads(config.read())
+        except Exception as err:
+            msg = 'Invalid config. {0}.'.format(err)
+            click.secho(msg, fg='red')
+            ctx.abort()
+    if encryption_key:
+        data['encryption_key'] = base64.b64encode(encryption_key)
     r = client.post(path, data)
+    with click.open_file('-', mode='wb') as f:
+        for chunk in r.iter_content(chunk_size=4096):
+            f.write(chunk)
+
+@click.command()
+@click.argument('url', metavar='URL')
+@click.option('--format', 'format_', default='auto', show_default=True)
+@click.option('--config', type=click.File())
+@auth.pass_client
+def pipe(client, url, format_, config):
+    """Anonymise data on the fly.
+
+      \b
+      Input from URL only (see `push` for local file support).
+      Writes the anonymised data to stdout.
+
+      Note that this parses, analyses and anonymises the data without
+      persisting it. As a result, `pipe` is slower for repeated access
+      than using `push` and `pull` to read previously ingested data.
+    """
+
+    path = '/redact/proxy'
+    data = {'url': url, 'format': format_}
+    if config:
+        try:
+            data['config'] = json.loads(config.read())
+        except Exception as err:
+            msg = 'Invalid config. {0}.'.format(err)
+            click.secho(msg, fg='red')
+            ctx.abort()
+    r = client.post(path, {'data': data})
     with click.open_file('-', mode='wb') as f:
         for chunk in r.iter_content(chunk_size=4096):
             f.write(chunk)
@@ -145,6 +168,6 @@ def main(ctx, endpoint):
 
 main.add_command(login)
 main.add_command(logout)
-main.add_command(pipe)
 main.add_command(push)
 main.add_command(pull)
+main.add_command(pipe)

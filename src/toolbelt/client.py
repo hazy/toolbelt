@@ -6,6 +6,7 @@ import hashlib
 import hmac
 import requests
 
+from . import aes
 from . import util
 
 class Client(object):
@@ -49,8 +50,11 @@ class Client(object):
         r = requests.post(url, headers=headers, json=data)
         return self.wrap(r)
 
-    def upload(self, path, input_):
+    def upload(self, path, file_, key):
         url = self.endpoint + path
+        iv = util.random_bytes(16)
         headers = self.auth_headers()
-        r = requests.post(url, headers=headers, files={'upload': input_})
+        headers['X-IV'] = base64.b64encode(iv)
+        iter_chunks = aes.gen_encrypted_chunks(file_, key, iv)
+        r = requests.post(url, data=iter_chunks, headers=headers)
         return self.wrap(r)
