@@ -37,7 +37,7 @@ def logout():
 @click.argument('input', metavar='FILE_OR_URL')
 @click.argument('name', metavar='RESOURCE_NAME') # XXX validate
 @click.option('--encryption-key', metavar='LONG_RANDOM_STRING')
-@click.option('--format', 'format_', default='auto', show_default=True)
+@click.option('--format', 'format_', default='text', show_default=True) # default='auto'
 @auth.pass_client
 def push(client, input, name, encryption_key, format_):
     """Ingest and store a data snapshot.
@@ -112,7 +112,7 @@ def pull(client, name, config, encryption_key):
 
 @click.command()
 @click.argument('url', metavar='URL')
-@click.option('--format', 'format_', default='auto', show_default=True)
+@click.option('--format', 'format_', default='text', show_default=True) # default='auto'
 @click.option('--config', type=click.File())
 @auth.pass_client
 def pipe(client, url, format_, config):
