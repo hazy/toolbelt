@@ -1,0 +1,11 @@
+{
+  "transform": {
+    "name": {
+      "action": "rand"
+    },
+    "username": {
+      "action": "blank",
+      "char": "~"
+    }
+  }
+}

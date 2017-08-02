@@ -5,12 +5,14 @@
 
 import base64
 import click
+import json
 import math
 import sys
 
 from . import alias
 from . import auth
 from . import client
+from . import util
 
 DEFAULT_ENDPOINT="https://api.anon.ai"
 
@@ -49,7 +51,7 @@ def push(client, input, name, encryption_key, format_):
 
     data = {'format': format_}
     if encryption_key:
-        data['encryption_key'] = base64.b64encode(encryption_key)
+        data['encryption_key'] = util.encode_key(encryption_key)
     if '://' in input:
         push_url(client, input, name, data)
     else:
@@ -75,10 +77,11 @@ def push_file(client, file_, name, data):
     path = r_data['path']
     datakey = base64.b64decode(r_data['datakey'])
     with click.open_file(file_, mode='rb') as f:
-        r = client.upload(path, f, datakey)
+        r = client.upload(path, f, datakey, data.get('encryption_key'))
+        # print(r.json())
     # Then parse.
     path = '/parse/source/default/{0}'.format(name)
-    r = client.post(path, {})
+    r = client.post(path, {'data': data})
     click.secho(r.text, fg='green')
 
 @click.command()
@@ -102,10 +105,10 @@ def pull(client, name, config, encryption_key):
         except Exception as err:
             msg = 'Invalid config. {0}.'.format(err)
             click.secho(msg, fg='red')
-            ctx.abort()
+            return
     if encryption_key:
-        data['encryption_key'] = base64.b64encode(encryption_key)
-    r = client.post(path, data)
+        data['encryption_key'] = util.encode_key(encryption_key)
+    r = client.post(path, {'data': data})
     with click.open_file('-', mode='wb') as f:
         for chunk in r.iter_content(chunk_size=4096):
             f.write(chunk)

@@ -1,6 +1,8 @@
+.DS_Store
 .Python
 .env.sh
 *.pyc
 __pycache__
+var
 venv
 src/*.egg-info

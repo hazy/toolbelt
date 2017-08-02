@@ -50,11 +50,13 @@ class Client(object):
         r = requests.post(url, headers=headers, json=data)
         return self.wrap(r)
 
-    def upload(self, path, file_, key):
+    def upload(self, path, file_, key, encryption_key):
         url = self.endpoint + path
         iv = util.random_bytes(16)
         headers = self.auth_headers()
         headers['X-IV'] = base64.b64encode(iv)
+        if encryption_key:
+            headers['X-ENCRYPTION-KEY'] = encryption_key
         iter_chunks = aes.gen_encrypted_chunks(file_, key, iv)
         r = requests.post(url, data=iter_chunks, headers=headers)
         return self.wrap(r)

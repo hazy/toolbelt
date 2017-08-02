@@ -1,0 +1,7 @@
+{
+  "transform": {
+    "all": {
+      "action": "rand"
+    }
+  }
+}
