@@ -5,7 +5,9 @@
 
 The Anon AI Toolbelt is a command line interface (CLI) tool for managing and anonymising data with the Anon AI web service.
 
-It's developed in Python and the code is open sourced at [github.com/anon-ai/toolbelt](https://github.com/anon-ai/toolbelt)
+It's developed in Python and the code is open sourced under the
+[MIT License](https://github.com/anon-ai/toolbelt/blob/master/LICENSE)
+at [github.com/anon-ai/toolbelt](https://github.com/anon-ai/toolbelt).
 
 ## Installation
 

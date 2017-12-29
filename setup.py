@@ -9,6 +9,7 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
+    python_requires='>=3',
     zip_safe=False,
     entry_points = {
         'console_scripts': [
