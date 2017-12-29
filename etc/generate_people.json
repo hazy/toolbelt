@@ -1,0 +1,22 @@
+{
+  "transform": {
+    "name": {
+      "action": "generate"
+    },
+    "person": {
+      "action": "generate"
+    },
+    "first_name": {
+      "action": "generate"
+    },
+    "last_name": {
+      "action": "generate"
+    },
+    "forename": {
+      "action": "generate"
+    },
+    "family_name": {
+      "action": "generate"
+    }
+  }
+}
