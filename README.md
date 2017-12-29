@@ -1,9 +1,9 @@
 
 # Anon AI Toolbelt
 
-The Anon AI Toolbelt is a command line interface (CLI) tool for managing and anonymising data with the [Anon AI web service](https://anon.ai). It's developed in Python and the code is published under the [MIT License](https://github.com/anon-ai/toolbelt/blob/master/LICENSE) at [github.com/anon-ai/toolbelt](https://github.com/anon-ai/toolbelt).
+The Anon AI Toolbelt is a command line interface (CLI) tool for managing and anonymising data with the [Anon AI web service](https://anon.ai).
 
-*Caution: the toolbelt is under active development. Core functionality works but commands and options are liable to change and some of the features that are documented don't yet exist.*
+It's developed in Python and the code is published under the [MIT License](https://github.com/anon-ai/toolbelt/blob/master/LICENSE) at [github.com/anon-ai/toolbelt](https://github.com/anon-ai/toolbelt).
 
 ## Installation
 
@@ -23,13 +23,6 @@ The primary workflow is for a data controller to `push` data into the system and
 - [anon push INPUT_FILE RESOURCE](#push)
 - [anon pull RESOURCE OUTPUT_FILE](#pull)
 - [anon pipe URL OUTPUT_FILE](#pipe)
-
-<!--
-
-- [anon locate RESOURCE](#locate)
-- [anon analyse RESOURCE](#analyse)
-- [anon inspect RESOURCE](#inspect)
--->
 
 ### Login
 
@@ -92,46 +85,6 @@ anon pipe http://humanstxt.org/humans.txt /tmp/humans.anon.txt
 
 This parses, analyses and anonymises the data on the fly, i.e.: without persisting it. The data source must currently be a URL.
 
-<!--
-
-### Locate
-
-As an alternative to pulling down the data locally, you can get a temporary download URL:
-
-```bash
-anon locate mydb
-```
-
-This writes a temporary url to stdout. As with `pull`, you can optionally specify an encryption key and configure anonymisation:
-
-```bash
-anon locate mydb --config config.json --encryption-key ...
-```
-
-You can also control the timeout duration for the URL. This defaults to 30 minutes and can be a maximum of 24 hours:
-
-```bash
-anon locate mydb --timeout 2h
-```
-
-### Analyse
-
-Analyse a snapshot to get our structural analysis of the data:
-
-```bash
-anon analyse mydb > analysis.json
-```
-
-### Inspect
-
-Inspect a resource name to list the versions and see its status:
-
-```bash
-anon inspect mydb
-```
-
--->
-
 ### Versions
 
 You can `pull` specific snapshot versions by targeting them by name:
@@ -162,4 +115,4 @@ bashcompinit
 eval "$(_ANON_COMPLETE=source anon)"
 ```
 
-For more information see [https://anon.ai](https://anon.ai)
+For more information see [Anon AI](https://anon.ai).
