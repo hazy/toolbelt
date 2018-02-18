@@ -21,7 +21,7 @@ class Client(object):
         self.secret = secret
 
     def auth_headers(self, path, data):
-        timestamp = datetime.utcnow().isoformat()
+        timestamp = datetime.utcnow().isoformat() + 'Z'
         parsed = urlparse(path)
         signed_data = '\n'.join([parsed.path,
                                  parsed.query,
@@ -63,7 +63,7 @@ class Client(object):
     def upload(self, path, file_, key, encryption_key):
         url = self.endpoint + path
         iv = util.random_bytes(16)
-        headers = self.auth_headers(path, '') # TODO: auth for uploads
+        headers = self.auth_headers(path, '')
         headers['X-IV'] = base64.b64encode(iv)
         if encryption_key:
             headers['X-ENCRYPTION-KEY'] = encryption_key
