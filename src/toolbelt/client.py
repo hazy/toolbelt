@@ -2,8 +2,10 @@
 
 import base64
 import click
+from datetime import datetime
 import hashlib
 import hmac
+import json
 import requests
 
 from . import aes
@@ -17,19 +19,20 @@ class Client(object):
         self.key = key
         self.secret = secret
 
-    def auth_headers(self):
+    def auth_headers(self, path, data):
+        timestamp = datetime.utcnow().isoformat()
+        signed_data = '\n'.join([path, data, timestamp]).encode('utf-8')
+        hashed_hex = hashlib.sha256(signed_data).hexdigest().encode('utf-8')
         key = self.key.encode('utf-8')
         secret = self.secret.encode('utf-8')
-        signed_data = util.unique_hash().encode('utf-8')
-        h = hmac.new(secret, signed_data, hashlib.sha256)
+        h = hmac.new(secret, hashed_hex, hashlib.sha256)
         signature = h.hexdigest().encode('utf-8')
         enc_signature = base64.b64encode(signature).decode('utf-8')
-        enc_signed_data = base64.b64encode(signed_data).decode('utf-8')
         enc_key = base64.b64encode(key).decode('utf-8')
         return {
             'Authorization': 'HMAC: {0}'.format(enc_signature),
             'X-Client-Key': enc_key,
-            'X-Signed-Data': enc_signed_data,
+            'X-Anon-Timestamp' : timestamp,
         }
 
     def wrap(self, response):
@@ -46,14 +49,16 @@ class Client(object):
 
     def post(self, path, data):
         url = self.endpoint + path
-        headers = self.auth_headers()
-        r = requests.post(url, headers=headers, json=data)
+        json_data = json.dumps(data)
+        headers = self.auth_headers(path, json_data)
+        headers['Content-Type'] = 'application/json'
+        r = requests.post(url, headers=headers, data=json_data)
         return self.wrap(r)
 
     def upload(self, path, file_, key, encryption_key):
         url = self.endpoint + path
         iv = util.random_bytes(16)
-        headers = self.auth_headers()
+        headers = self.auth_headers(path, '') # TODO: auth for uploads
         headers['X-IV'] = base64.b64encode(iv)
         if encryption_key:
             headers['X-ENCRYPTION-KEY'] = encryption_key
