@@ -7,6 +7,7 @@ import hashlib
 import hmac
 import json
 import requests
+from urllib.parse import urlparse
 
 from . import aes
 from . import util
@@ -21,7 +22,11 @@ class Client(object):
 
     def auth_headers(self, path, data):
         timestamp = datetime.utcnow().isoformat()
-        signed_data = '\n'.join([path, data, timestamp]).encode('utf-8')
+        parsed = urlparse(path)
+        signed_data = '\n'.join([parsed.path,
+                                 parsed.query,
+                                 data,
+                                 timestamp]).encode('utf-8')
         hashed_hex = hashlib.sha256(signed_data).hexdigest().encode('utf-8')
         key = self.key.encode('utf-8')
         secret = self.secret.encode('utf-8')
