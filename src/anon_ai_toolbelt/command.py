@@ -150,7 +150,7 @@ def pipe(client, url, format_, config):
               help='Web service API endpoint.')
 @click.pass_context
 def main(ctx, endpoint):
-    """Anon AI :: Automatic data anonymisation using AI.
+    """Anon AI :: Automated data anonymisation using AI.
 
       Share data securely using a workflow tool that automatically anonymises
       and adapts to changing datasets.

@@ -3,6 +3,7 @@
 .env.sh
 *.pyc
 __pycache__
+dist
 var
 venv
 src/*.egg-info

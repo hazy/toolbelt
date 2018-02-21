@@ -1,35 +1,28 @@
 
-*Caution: this repo is work in progress under active development. It's likely that many features don't yet exist, let alone work.*
-
 # Anon AI Toolbelt
 
-The Anon AI Toolbelt is a command line interface (CLI) tool for managing and anonymising data with the Anon AI web service.
+The Anon AI Toolbelt is a command line interface (CLI) tool for managing and anonymising data with the [Anon AI web service](https://anon.ai).
 
-It's developed in Python and the code is open sourced at [github.com/anon-ai/toolbelt](https://github.com/anon-ai/toolbelt)
+It's developed in Python and the code is published under the [MIT License](https://github.com/anon-ai/toolbelt/blob/master/LICENSE) at [github.com/anon-ai/toolbelt](https://github.com/anon-ai/toolbelt).
 
 ## Installation
 
-Current installation is via pip:
+Install using `pip` into a Python3 environment:
 
 ```bash
 pip install anon-ai-toolbelt
 ```
 
+Note that the toolbelt only works with Python3 and installs dependencies including the [Python Cryptography Toolkit](https://pypi.python.org/pypi/pycrypto).
+
 ## Usage
 
-The primary workflow is for a privileged process or developer to `push` data into the system and then for less-privileged processes, developers or collaborators to `pull` the data down in anonymised form.
-
-Data anonymisation can be configured differently for different users or use cases. This configuration is integrated with a role-based permission system that controls which users can access which aspects of which data.
-
-*Note that the anonymisation configuration options and the role-based permission system are currently unspecified.*
+The primary workflow is for a data controller to `push` data into the system and then for data processors to `pull` the data down in anonymised form.
 
 - [anon login](#login)
-- [anon pipe INPUT OUTPUT](#pipe)
-- [anon push INPUT RESOURCE](#push)
-- [anon pull RESOURCE OUTPUT](#pull)
-- [anon locate RESOURCE](#locate)
-- [anon analyse RESOURCE](#analyse)
-- [anon inspect RESOURCE](#inspect)
+- [anon push INPUT_FILE RESOURCE](#push)
+- [anon pull RESOURCE OUTPUT_FILE](#pull)
+- [anon pipe URL OUTPUT_FILE](#pipe)
 
 ### Login
 
@@ -41,28 +34,6 @@ anon login
 > secret: ...
 ```
 
-### Pipe
-
-Pipe data through to anonymise it:
-
-```bash
-anon pipe foo.sql result.sql
-```
-
-This parses, analyses and anonymises the data on the fly, i.e.: without persisting it. The data source can be a local filepath or a URL:
-
-```bash
-anon pipe http://example.com/foo.sql result.sql
-```
-
-You can specify the data format and configure how you'd like it anonymised:
-
-```bash
-anon pipe foo.sql result.sql --format postgres --config config.json
-```
-
-*Note that the anonymisation configuration options are currently unspecified.*
-
 ### Push
 
 Push a data snapshot up to ingest and store it.
@@ -71,10 +42,10 @@ Push a data snapshot up to ingest and store it.
 anon push foo.dump mydb
 ```
 
-Format and source options are the same as with `pipe` above, e.g.:
+When ingesting structured data you should specify the data format:
 
 ```bash
-anon push http://example.com/foo.sql mydb --format postgres
+anon push foo.dump mydb --format postgres
 ```
 
 In this example, `mydb` is an arbitrary resource name that you use to identify this ingested data source. Subsequent pushes to the same name are usually used to store a new snapshot of the same file or database.
@@ -104,50 +75,22 @@ Optionally provide an encryption key (to decrypt the stored data with) and / or 
 anon pull mydb foo.dump --config config.json --encryption-key ...
 ```
 
-### Locate
+### Pipe
 
-As an alternative to pulling down the data locally, you can get a temporary download URL:
-
-```bash
-anon locate mydb
-```
-
-This writes a temporary url to stdout. As with `pull`, you can optionally specify an encryption key and configure anonymisation:
+Pipe data through to anonymise it:
 
 ```bash
-anon locate mydb --config config.json --encryption-key ...
+anon pipe http://humanstxt.org/humans.txt /tmp/humans.anon.txt
 ```
 
-You can also control the timeout duration for the URL. This defaults to 30 minutes and can be a maximum of 24 hours:
-
-```bash
-anon locate mydb --timeout 2h
-```
-
-### Analyse
-
-Analyse a snapshot to get our structural analysis of the data:
-
-```bash
-anon analyse mydb > analysis.json
-```
-
-### Inspect
-
-Inspect a resource name to list the versions and see its status:
-
-```bash
-anon inspect mydb
-```
+This parses, analyses and anonymises the data on the fly, i.e.: without persisting it. The data source must currently be a URL.
 
 ### Versions
 
-You can `pull`, `download` and `inspect` specific snapshot versions by targeting them by name:
+You can `pull` specific snapshot versions by targeting them by name:
 
 ```bash
 anon pull mydb --snapshot someid
-anon download mydb --snapshot someid
-anon inspect mydb --snapshot someid
 ```
 
 You can also `push` snapshots up with a specific name:
@@ -172,10 +115,4 @@ bashcompinit
 eval "$(_ANON_COMPLETE=source anon)"
 ```
 
-### Todo
-
-- better repr results (include type, etc.)
-- consistent -o --output formatting i.e. yaml, json
-- -v --verbose for logging
-- bash and zsh tab complete
-- coloured output
+For more information see [Anon AI](https://anon.ai).
