@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 
-python setup.py sdist register upload
+python setup.py sdist upload

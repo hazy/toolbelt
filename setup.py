@@ -14,7 +14,7 @@ setup(
     name='hazy',
     description='Hazy command line interface (CLI) toolbelt.',
     long_description=long_description,
-    url='https://github.com/hazy-ai/toolbelt',
+    url='https://github.com/hazy/toolbelt',
     author='Hazy',
     author_email='info@hazy.com',
     version=version,

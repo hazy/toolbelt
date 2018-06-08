@@ -1,6 +1,6 @@
-"""Anon AI command line interface.
+"""Hazy command line interface.
 
-  Run `anon --help` for usage.
+  Run `hazy --help` for usage.
 """
 
 import click
@@ -20,3 +20,5 @@ def main(ctx, endpoint):
 
 if __name__ == '__main__':
     main()
+
+# https://devcenter.heroku.com/articles/authentication
