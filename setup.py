@@ -37,7 +37,7 @@ setup(
     zip_safe=False,
     entry_points = {
         'console_scripts': [
-            'hazy = hazy.command:main',
+            'hazy = hazy.main:cli',
         ],
     },
 )
