@@ -12,7 +12,11 @@ from .resources.entity import entity
 from .resources.policy import policy
 from .resources.source import source
 
+from .util import browser
+
+
 DEFAULT_ENDPOINT="https://api.hazy.com"
+DOCUMENTATION_URL="https://hazy.com/docs"
 
 @click.group(cls=aliased.Group, section_label='Resources')
 @click.option('--endpoint', metavar='URL', envvar='HAZY_ENDPOINT',
@@ -30,7 +34,7 @@ def cli(ctx, endpoint):
 def docs(obj):
     """Open the online documentation in a web browser."""
 
-    raise NotImplementedError
+    browser.open(DOCUMENTATION_URL)
 
 cli.add_command(auth)
 cli.add_command(entity)

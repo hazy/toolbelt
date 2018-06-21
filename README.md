@@ -10,3 +10,23 @@ It's developed in Python and the code is published under the [MIT License](https
 This version of the toolbelt is being re-written with a new command structure to work with the second version of the Hazy console.
 
 It's not ready to use yet.
+
+## Install
+
+```sh
+pip install -r requirements.txt
+pip install -r maintainer-requirements.txt
+python setup.py develop
+```
+
+## Run
+
+```sh
+hazy --help
+```
+
+## Test
+
+```sh
+nosetests --with-coverage --cover-package hazy
+```
