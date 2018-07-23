@@ -11,6 +11,15 @@ This version of the toolbelt is being re-written with a new command structure to
 
 It's not ready to use yet.
 
+## Dependencies
+On macOS, install Pandoc using Homebrew
+
+```sh
+brew install pandoc
+```
+
+Refer to [Pandoc Documentation](https://pandoc.org/installing.html) on how to install for various other platforms.
+
 ## Install
 
 ```sh
