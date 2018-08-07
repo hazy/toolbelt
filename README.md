@@ -17,6 +17,7 @@ The toolbelt is designed to be used as a pre-built standalone binary. One way to
 Alternatively on OSX you can install using Homebrew:
 
 ```sh
+brew tap hazy/toolbelt
 brew install hazy
 ```
 
