@@ -30,7 +30,6 @@ setup(
     include_package_data=True,
     install_requires=[
       'click>=5',
-      'pycrypto>=2',
       'requests>=2',
     ],
     python_requires='>=3',
