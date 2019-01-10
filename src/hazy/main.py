@@ -4,7 +4,17 @@
 
 import click
 
-@click.command()
+from .commands.auth import auth
+from .commands.db import db
+from .commands.generator import generator
+from .commands.synthetic import synthetic
+
+@click.group()
 def cli():
-    """Example script."""
-    click.echo('Hazy toolbelt - Unlock data innovation.!')
+    '''Hazy toolbelt - Unlock data innovation!
+    '''
+
+cli.add_command(auth)
+cli.add_command(db)
+cli.add_command(generator)
+cli.add_command(synthetic)
