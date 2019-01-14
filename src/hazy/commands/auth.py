@@ -13,9 +13,15 @@ def auth():
 @auth.command()
 def login():
     '''Login in to use Hazy toolbelt
+
+    Example:
+    `hazy auth login --email email --pass pass`
     '''
 
 @auth.command()
 def logout():
     '''Logout and remove all stored credentials
+
+    Example:
+    `hazy auth logout`
     '''
